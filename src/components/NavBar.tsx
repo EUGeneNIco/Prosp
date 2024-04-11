@@ -22,8 +22,8 @@ export default function NavBar() {
                     <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                            <ListItem href="/docs" title="Introduction">
-                                Re-usable components built using Radix UI and Tailwind CSS.
+                            <ListItem href="/" title="Introduction">
+                                Go to dashboard
                             </ListItem>
                         </ul>
                     </NavigationMenuContent>

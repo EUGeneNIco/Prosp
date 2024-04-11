@@ -12,6 +12,11 @@ import { Send } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 export function Chat() {
+
+    function handleSend() {
+        console.log('Sending')
+    }
+
     return (
         <Card style={{ margin: '0 auto' }} className="w-[350px]">
             <CardHeader>
@@ -32,7 +37,7 @@ export function Chat() {
                         <Input id="name" placeholder="Type here..." />
                     </div>
                     <div className="space-y-1.5">
-                        <Button><Send className="h-4 w-4" /></Button>
+                        <Button type="button" onClick={handleSend}><Send className="h-4 w-4" /></Button>
                     </div>
                 </form>
             </CardFooter>
