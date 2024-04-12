@@ -19,11 +19,14 @@ export default function NavBar() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuTrigger>Dashboard</NavigationMenuTrigger>
+                    <NavigationMenuTrigger>Navigations</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                            <ListItem href="/" title="Introduction">
-                                Go to dashboard
+                            <ListItem href="/" title="Chat list">
+                                DMs
+                            </ListItem>
+                            <ListItem href="/login" title="Login page">
+                                Test creds
                             </ListItem>
                         </ul>
                     </NavigationMenuContent>

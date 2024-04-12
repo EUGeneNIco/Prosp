@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import {
     ColumnDef,
@@ -37,36 +38,12 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const data: Member[] = [
-    {
-        id: 1,
-        name: 'Eugene Nico Hermano',
-        isOnline: false,
-        email: 'euni@yahoo.com',
-        job: 'Software Engineer'
-    },
-    {
-        id: 2,
-        name: 'Philip Gomez',
-        isOnline: false,
-        email: 'pg@yahoo.com',
-        job: 'UI/UX Designer'
-    },
-    {
-        id: 3,
-        name: 'Mary Ramos',
-        isOnline: false,
-        email: 'mr@yahoo.com',
-        job: 'Manager'
-    }
-]
-
 export type Member = {
     id: number
     isOnline: boolean
     name: string
     email: string
-    job: string
+    role: string
 }
 
 export const columns: ColumnDef<Member>[] = [
@@ -90,9 +67,9 @@ export const columns: ColumnDef<Member>[] = [
         ),
     },
     {
-        accessorKey: "job",
+        accessorKey: "role",
         header: "Role",
-        cell: ({ row }) => <div>{row.getValue("job")}</div>,
+        cell: ({ row }) => <div>{row.getValue("role")}</div>,
     },
     {
         id: "actions",
@@ -125,13 +102,31 @@ export const columns: ColumnDef<Member>[] = [
 ]
 
 export function MemberList() {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    const [data, setMembers] = useState<Member[]>([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
         []
     )
     const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+        useState<VisibilityState>({})
+    const [rowSelection, setRowSelection] = useState({})
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('https://localhost:7036/api/users');
+
+                if (!response.ok) throw new Error('Failed fetching...');
+
+                const jsonData = await response.json();
+                setMembers(jsonData);
+            } catch (error) {
+                console.log('Error', error);
+            }
+        };
+
+        fetchData();
+    }, [])
 
     const table = useReactTable({
         data,
