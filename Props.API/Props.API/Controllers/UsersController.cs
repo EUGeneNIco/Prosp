@@ -15,15 +15,17 @@ namespace Props.API.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
+        [HttpGet("otherUsers/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetUsers()
+        public async Task<ActionResult<List<UserDto>>> GetUsers(int userId)
         {
             try
             {
-                var users = this.dbContext.Users.Select(u => new UserDto
+                var users = this.dbContext.Users
+                    .Where(u => u.Id != userId)
+                    .Select(u => new UserDto
                 {
                     Id = u.Id,
                     Name = u.Name,
@@ -43,7 +45,7 @@ namespace Props.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> GetUser(int userId)
+        public async Task<ActionResult> GetUserDetails(int userId)
         {
             try
             {

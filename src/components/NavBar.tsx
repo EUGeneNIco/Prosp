@@ -1,6 +1,7 @@
 "use client"
-
+import { TOKEN_NAME } from "./Globals";
 import * as React from "react"
+import { LogOut } from "lucide-react";
 // import Link from "next/link"
 
 import { cn } from "@/lib/utils"
@@ -12,10 +13,63 @@ import {
     NavigationMenuLink,
     NavigationMenuList,
     NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu"
+} from "@/components/ui/navigation-menu";
+
+import { Button } from "./ui/button";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator
+
+} from "@/components/ui/dropdown-menu"
+
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function NavBar() {
+    const [userName, setUsername] = useState('User');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        getUserNameFromLocalStorage();
+    }, []);
+
+    function getUserNameFromLocalStorage() {
+        const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);
+        if (!tokenFromLocalStorage) {
+            navigate('/login', { replace: true })
+            return
+        }
+
+        const payLoad = JSON.parse(window.atob(tokenFromLocalStorage.split('.')[1]));
+
+        if (!payLoad) navigate('/login', { replace: true });
+
+        setUsername(() => payLoad.unique_name);
+    }
+
+    function handleLogout() {
+        console.log('logging out...');
+        localStorage.removeItem(TOKEN_NAME);
+        localStorage.removeItem('user');
+        navigate('/login', { replace: true });
+    }
+
     return (
+
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
@@ -25,11 +79,48 @@ export default function NavBar() {
                             <ListItem href="/" title="Chat list">
                                 DMs
                             </ListItem>
-                            <ListItem href="/login" title="Login page">
-                                Test creds
-                            </ListItem>
                         </ul>
                     </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="overflow-hidden rounded-full"
+                                style={{ width: '30px', height: '30px' }}
+                            >
+                                <img
+                                    src="/src/assets/usericon.png"
+                                    alt="Avatar"
+                                    className="overflow-hidden rounded-full"
+                                    style={{ backgroundColor: "#fffd" }}
+                                />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Welcome back {userName}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="outline">Logout <span className="ml-2"><LogOut /></span></Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure you want to logout?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            You will be redirected to login page.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>

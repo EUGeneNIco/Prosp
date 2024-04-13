@@ -13,18 +13,18 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <NavBar />
-      <div style={wrapper}>
-        <Router>
+      <Router>
+        <NavBar />
+        <div style={wrapper}>
           <Routes>
             <Route path="/" Component={Dashboard} />
             <Route path="/chat/:id" Component={Chat} />
             <Route path="/login" Component={Login} />
           </Routes>
-        </Router>
-      </div>
+        </div>
+      </Router>
 
-    </ThemeProvider>
+    </ThemeProvider >
   )
 }
 

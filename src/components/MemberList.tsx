@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { TOKEN_NAME } from "./Globals";
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -102,6 +104,8 @@ export const columns: ColumnDef<Member>[] = [
 ]
 
 export function MemberList() {
+    const navigate = useNavigate();
+    const [userId, setUserId] = useState(0);
     const [data, setMembers] = useState<Member[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -112,9 +116,10 @@ export function MemberList() {
     const [rowSelection, setRowSelection] = useState({})
 
     useEffect(() => {
+        getUserNameFromLocalStorage();
         const fetchData = async () => {
             try {
-                const response = await fetch('https://localhost:7036/api/users');
+                const response = await fetch('https://localhost:7036/api/users/otherUsers/' + userId);
 
                 if (!response.ok) throw new Error('Failed fetching...');
 
@@ -124,9 +129,22 @@ export function MemberList() {
                 console.log('Error', error);
             }
         };
+        if (userId > 0) fetchData();
+    }, [userId])
 
-        fetchData();
-    }, [])
+    function getUserNameFromLocalStorage() {
+        const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);
+        if (!tokenFromLocalStorage) {
+            navigate('/login', { replace: true })
+            return
+        }
+
+        const payLoad = JSON.parse(window.atob(tokenFromLocalStorage.split('.')[1]));
+
+        if (!payLoad) navigate('/login', { replace: true });
+
+        setUserId(payLoad.UserGuid);
+    }
 
     const table = useReactTable({
         data,

@@ -9,10 +9,24 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react";
+import { TOKEN_NAME } from "./Globals";
+import { useNavigate } from "react-router-dom";
+
+type AuthResponse = {
+    token: string
+}
 
 export function Login() {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
+    function handleToken(data: AuthResponse) {
+        // console.log('data', data);
+
+        localStorage.setItem(TOKEN_NAME, data.token);
+        localStorage.setItem('user', JSON.stringify(data));
+    }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault(); // Prevent default form submission behavior
@@ -20,7 +34,29 @@ export function Login() {
             username: username,
             password: password
         }
-        console.log('login:', loginData);
+        // console.log('login:', loginData);
+
+        fetch('https://localhost:7036/api/auth', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data: AuthResponse) => {
+                handleToken(data);
+                navigate('/', { replace: true });
+            })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
+            });
     }
 
     return (
