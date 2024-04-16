@@ -38,12 +38,11 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-interface Props {
+interface NavBarProps {
     username: string
 }
 
-export default function NavBar(props: Props) {
-    const { username } = props;
+export default function NavBar({ username }: NavBarProps) {
     const navigate = useNavigate();
 
     function handleLogout() {

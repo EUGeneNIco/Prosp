@@ -81,7 +81,6 @@ function App() {
 
   useEffect(() => {
     getUserIdFromLocalStorage();
-    console.log('do we have username? ', username, userId);
     if (username && userId > 0)
       userIsOnline(username, userId);
   }, [username, userId])

@@ -103,12 +103,11 @@ export const columns: ColumnDef<Member>[] = [
     },
 ]
 
-interface Props {
+type MemberListProps = {
     onlineUserIds: number[]
 }
 
-export function MemberList(props: Props) {
-    const { onlineUserIds } = props
+export function MemberList({ onlineUserIds }: MemberListProps) {
     const navigate = useNavigate();
     const [userId, setUserId] = useState(0);
     const [data, setMembers] = useState<Member[]>([]);
