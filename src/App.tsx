@@ -4,6 +4,11 @@ import NavBar from "./components/NavBar";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Chat } from "./components/Chat";
 import { Login } from "./components/Login";
+import { useEffect, useState } from "react";
+import { LogLevel, HubConnectionBuilder } from '@microsoft/signalr';
+import { TOKEN_NAME } from "./components/Globals";
+import { useToast } from "@/components/ui/use-toast"
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   const wrapper = {
@@ -11,19 +16,78 @@ function App() {
     margin: '0 auto'
   }
 
+  // const [conn, setConnection] = useState<HubConnection>();
+  // const [onlineToast, setOnlineToast] = useState();
+  const { toast } = useToast()
+  // const [userId, setUserId] = useState();
+  const [username, setUsername] = useState('');
+
+  const userIsOnline = async (name: string) => {
+    try {
+      console.log('connecting to hub...');
+      const conn = new HubConnectionBuilder()
+        .withUrl("https://localhost:7036/chat")
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      conn.on("UserIsOnline", (name, msg) => {
+        console.log("mgs: ", msg);
+        toast({
+          title: `${msg}`,
+          // description: "Friday, February 10, 2023 at 5:57 PM",
+          // action: (
+          //   <ToastAction altText="Chat now">Chat</ToastAction>
+          // ),
+        })
+      });
+
+      await conn.start();
+      await conn.invoke("UserIsOnline", { name });
+
+      // setConnection(conn);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleLogin(tokenData: string) {
+    const payLoad = JSON.parse(window.atob(tokenData.split('.')[1]));
+    setUsername(payLoad.unique_name);
+  }
+
+  function getUserIdFromLocalStorage() {
+    const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);
+    if (!tokenFromLocalStorage) {
+      return
+    }
+
+    const payLoad = JSON.parse(window.atob(tokenFromLocalStorage.split('.')[1]));
+
+    // setUserId(payLoad.UserGuid);
+    setUsername(payLoad.unique_name);
+  }
+
+  useEffect(() => {
+    getUserIdFromLocalStorage();
+    console.log('do we have username? ', username);
+    if (username)
+      userIsOnline(username);
+  }, [username])
+
   return (
+
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Router>
-        <NavBar />
+        <NavBar username={username} />
         <div style={wrapper}>
           <Routes>
             <Route path="/" Component={Dashboard} />
             <Route path="/chat/:id" Component={Chat} />
-            <Route path="/login" Component={Login} />
+            <Route path="/login" element={<Login handleLogin={handleLogin} />} />
           </Routes>
         </div>
       </Router>
-
+      <Toaster />
     </ThemeProvider >
   )
 }

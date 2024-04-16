@@ -116,7 +116,7 @@ export function MemberList() {
     const [rowSelection, setRowSelection] = useState({})
 
     useEffect(() => {
-        getUserNameFromLocalStorage();
+        getUserIdFromLocalStorage();
         const fetchData = async () => {
             try {
                 const response = await fetch('https://localhost:7036/api/users/otherUsers/' + userId);
@@ -132,7 +132,7 @@ export function MemberList() {
         if (userId > 0) fetchData();
     }, [userId])
 
-    function getUserNameFromLocalStorage() {
+    function getUserIdFromLocalStorage() {
         const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);
         if (!tokenFromLocalStorage) {
             navigate('/login', { replace: true })

@@ -16,7 +16,12 @@ type AuthResponse = {
     token: string
 }
 
-export function Login() {
+interface Props {
+    handleLogin: (tokenData:string) => void;
+}
+
+export function Login(props: Props) {
+    const { handleLogin } = props;
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -26,6 +31,8 @@ export function Login() {
 
         localStorage.setItem(TOKEN_NAME, data.token);
         localStorage.setItem('user', JSON.stringify(data));
+
+        handleLogin(JSON.stringify(data));
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

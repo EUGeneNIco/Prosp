@@ -30,7 +30,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors(builder => builder.WithOrigins("http://127.0.0.1:5173").AllowAnyHeader().AllowAnyMethod());
+app.UseCors(builder => builder.WithOrigins("http://127.0.0.1:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials());
 
 app.MapHub<ChatHub>("/chat");
 

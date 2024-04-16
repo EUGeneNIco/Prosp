@@ -37,29 +37,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 
-export default function NavBar() {
-    const [userName, setUsername] = useState('User');
+interface Props {
+    username: string
+}
+
+export default function NavBar(props: Props) {
+    const { username } = props;
     const navigate = useNavigate();
-
-    useEffect(() => {
-        getUserNameFromLocalStorage();
-    }, []);
-
-    function getUserNameFromLocalStorage() {
-        const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);
-        if (!tokenFromLocalStorage) {
-            navigate('/login', { replace: true })
-            return
-        }
-
-        const payLoad = JSON.parse(window.atob(tokenFromLocalStorage.split('.')[1]));
-
-        if (!payLoad) navigate('/login', { replace: true });
-
-        setUsername(() => payLoad.unique_name);
-    }
 
     function handleLogout() {
         console.log('logging out...');
@@ -100,7 +85,7 @@ export default function NavBar() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Welcome back {userName}</DropdownMenuLabel>
+                            <DropdownMenuLabel>Welcome back {username}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
