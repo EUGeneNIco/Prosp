@@ -42,7 +42,7 @@ import {
 
 export type Member = {
     id: number
-    isOnline: boolean
+    isOnline?: boolean
     name: string
     email: string
     role: string
@@ -103,7 +103,12 @@ export const columns: ColumnDef<Member>[] = [
     },
 ]
 
-export function MemberList() {
+interface Props {
+    onlineUserIds: number[]
+}
+
+export function MemberList(props: Props) {
+    const { onlineUserIds } = props
     const navigate = useNavigate();
     const [userId, setUserId] = useState(0);
     const [data, setMembers] = useState<Member[]>([]);
@@ -123,14 +128,20 @@ export function MemberList() {
 
                 if (!response.ok) throw new Error('Failed fetching...');
 
-                const jsonData = await response.json();
+                const jsonData: Member[] = await response.json();
+
+                onlineUserIds.forEach(userId => {
+                    const data = jsonData.find((jd) => jd.id == userId);
+                    if (data) data.isOnline = true;
+                });
+
                 setMembers(jsonData);
             } catch (error) {
                 console.log('Error', error);
             }
         };
         if (userId > 0) fetchData();
-    }, [userId])
+    }, [userId, onlineUserIds])
 
     function getUserIdFromLocalStorage() {
         const tokenFromLocalStorage = localStorage.getItem(TOKEN_NAME);

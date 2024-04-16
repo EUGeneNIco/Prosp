@@ -19,12 +19,14 @@ function App() {
   // const [conn, setConnection] = useState<HubConnection>();
   // const [onlineToast, setOnlineToast] = useState();
   const { toast } = useToast()
-  // const [userId, setUserId] = useState();
   const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState(0);
+  const [onlineUserIds, setOnlineUserIds] = useState<number[]>([]);
 
-  const userIsOnline = async (name: string) => {
+  const userIsOnline = async (name: string, userId: number) => {
     try {
-      console.log('connecting to hub...');
+      userId = +userId;
+      console.log('connecting to hub...', name, userId);
       const conn = new HubConnectionBuilder()
         .withUrl("https://localhost:7036/chat")
         .configureLogging(LogLevel.Information)
@@ -41,8 +43,17 @@ function App() {
         })
       });
 
+      conn.on("UserIdIsOnline", (name, msg) => {
+        setOnlineUserIds((prevIds) => {
+          if (prevIds.includes(msg))
+            return prevIds;
+          return [...prevIds, msg];
+        });
+      });
+
       await conn.start();
       await conn.invoke("UserIsOnline", { name });
+      await conn.invoke("UserIdIsOnline", { userId });
 
       // setConnection(conn);
     } catch (error) {
@@ -52,6 +63,7 @@ function App() {
 
   function handleLogin(tokenData: string) {
     const payLoad = JSON.parse(window.atob(tokenData.split('.')[1]));
+    setUserId(payLoad.UserGuid)
     setUsername(payLoad.unique_name);
   }
 
@@ -69,10 +81,10 @@ function App() {
 
   useEffect(() => {
     getUserIdFromLocalStorage();
-    console.log('do we have username? ', username);
-    if (username)
-      userIsOnline(username);
-  }, [username])
+    console.log('do we have username? ', username, userId);
+    if (username && userId > 0)
+      userIsOnline(username, userId);
+  }, [username, userId])
 
   return (
 
@@ -81,7 +93,7 @@ function App() {
         <NavBar username={username} />
         <div style={wrapper}>
           <Routes>
-            <Route path="/" Component={Dashboard} />
+            <Route path="/" element={<Dashboard onlineUserIds={onlineUserIds} />} />
             <Route path="/chat/:id" Component={Chat} />
             <Route path="/login" element={<Login handleLogin={handleLogin} />} />
           </Routes>

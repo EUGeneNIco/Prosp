@@ -10,6 +10,12 @@ namespace Props.API.Hubs
             await Clients.Others.SendAsync("UserIsOnline", "admin", $"{conn.Name} is online.");
         }
 
+        public async Task UserIdIsOnline(UserConnection conn)
+        {
+            await Clients.Others.SendAsync("UserIdIsOnline", "admin", $"{conn.UserId}");
+        }
+
+
         public async Task JoinSpecificChatRoom(UserConnection conn)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, conn.ChatRoom);
